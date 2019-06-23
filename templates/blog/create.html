@@ -1,0 +1,30 @@
+<!--#######################################
+# 檔名: create.html
+# 功能: 新增TODO事項的頁面
+# TODO: No
+##########################################-->
+
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}New TODO{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <label for="title">Title</label>
+    <input name="title" id="title" value="{{ request.form['title'] }}" required>
+    <label for="due">Deadline</label>
+    <input name="due" id="due" value="{{ request.form['due'] }}">
+
+    <label for="labels">Labels</label>
+    <div class="choices">
+	    {% for label in g.user['labels'].split() %}
+	      <li><input type="checkbox" name="labels" value="{{ label }}">{{ label }}</li>
+	    {% endfor %}
+	</div>
+    <label for="body">Body</label>
+    <textarea name="body" id="body">{{ request.form['body'] }}</textarea>
+    <input type="submit" value="Save">
+  </form>
+{% endblock %}

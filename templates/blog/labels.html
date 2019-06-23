@@ -1,0 +1,19 @@
+<!--#######################################
+# 檔名: labels.html
+# 功能: 編輯標籤的頁面
+# TODO: No
+##########################################-->
+
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Edit Labels{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <label for="labels">Labels</label>
+    <input name="labels" id="labels" value="{{ request.form['labels'] or labels}}">
+    <input type="submit" value="Save">
+  </form>
+{% endblock %}

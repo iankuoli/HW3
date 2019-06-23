@@ -1,0 +1,115 @@
+<!--#######################################
+# 檔名: index.html
+# 功能: 主頁面
+# TODO: 要實作編輯labels頁面的部分時，修改連結、新增Hello連結
+##########################################-->
+
+{% extends 'base.html' %}
+
+{% block header %}
+  {% if g.user %}
+  <h1>{% block title %}Hello, {{ g.user['username'] }}! This is your TODO list!{% endblock %}</h1>
+    <a class="action" href="{{ url_for('blog.create') }}">New</a>
+    <!-- #################################
+    ##                                  ##
+    ##  ######   ####   #####    ####   ##
+    ##    ##    ##  ##  ##  ##  ##  ##  ##
+    ##    ##    ##  ##  ##  ##  ##  ##  ##
+    ##    ##     ####   #####    ####   ##
+    ##                                  ##
+    ################################## -->
+    <a class="action" href="{{ url_for('blog.hello') }}">Hello</a>
+    <a class="action" href="{{ url_for('blog.edit_labels') }}">Edit Labels</a> <!-- TODO: 更改href使其連接到blog.py中的edit_labels函數-->
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <!-- 選擇過濾方式 -->
+  <form method="post">
+    <div>
+      <label for="filter">Filter: </label>
+      <div class="choices">
+
+        <!-- 列出filter選項 -->
+        {% for f in filters %}
+          {% if not session.get('filter') %}
+            <li><input type="checkbox" value="{{ f }}" name="filter">{{ f }}</li>
+          {% elif f in session.get('filter') %}
+            <li><input type="checkbox" value="{{ f }}" name="filter" checked>{{ f }}</li>
+          {% else %}
+            <li><input type="checkbox" value="{{ f }}" name="filter">{{ f }}</li>
+          {% endif %}
+        {% endfor %}
+
+        <!-- 列出label -->
+        {% for l in labels.split() %}
+          {% if not session.get('filter') %}
+            <li><input type="checkbox" value="{{ l }}" name="filter">{{ l }}</li>
+          {% elif l in session.get('filter') %}
+            <li><input type="checkbox" value="{{ l }}" name="filter" checked>{{ l }}</li>
+          {% else %}
+            <li><input type="checkbox" value="{{ l }}" name="filter">{{ l }}</li>
+          {% endif %}
+        {% endfor %}
+
+      </div>
+      <input type="submit" value="Go">
+    </div>
+  </form>
+
+  <!-- 選擇排序方式 -->
+  <form method="post">
+    <div>
+      <label for="sort_key">Sort by: </label>
+      <select name="sort_key">
+      {% for f in sort_keys %}
+        {% if not session.get('sort_key') %}
+          <option value="{{ f }}">{{ f }}</option>
+        {% elif f == session.get('sort_key') %}
+          <option value="{{ f }}" selected>{{ f }}</option>
+        {% else %}
+          <option value="{{ f }}">{{ f }}</option>
+        {% endif %}
+      {% endfor %}
+      </select>
+      <input type="submit" value="Sort">
+    </div>
+  </form>
+
+  <!-- 列出符合條件的事項 -->
+  {% for post in posts %}
+    <article class="post">
+      <header>
+        <div>
+        {% if post['done'] %}
+          <h1 class="done">{{ post['title'] }}</h1>
+        {% else %}
+          <h1>{{ post['title'] }}</h1>
+        {% endif %}
+        {% if post['due'] %}
+          <div class="about">Due: {{ post['due'] }}</div>
+        {% endif %}
+        {% if post['labels'] %}
+          <div class="about">Labels: {{ post['labels'] }}</div>
+        {% endif %}
+        </div>
+        {% if g.user['id'] == post['author_id'] %}
+          <a class="action" href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
+          <form action="{{ url_for('blog.done', id=post['id']) }}" method="post">
+            <button class="action" type="submit" value="Done" onclick="return 1;">
+              {% if post['done'] %}
+                Undone
+              {% else %}
+                Done
+              {% endif %}
+            </button>
+          </form>
+        {% endif %}
+      </header>
+      <p class="body">{{ post['body'] }}</p>
+    </article>
+    {% if not loop.last %}
+      <hr>
+    {% endif %}
+  {% endfor %}
+{% endblock %}
